@@ -851,6 +851,15 @@ function module_exists(name) {
 }
 
 /**
+ * allow to run with args
+ */
+
+exports.runWithArgs = function(args) {
+    var munch = new Muncher(args);
+    munch.run();
+};
+
+/**
  * let's not forget to expose this
  */
 exports.run = function() {
