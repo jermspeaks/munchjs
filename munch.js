@@ -20,7 +20,7 @@ var    path = require('path'),
         clc = require('cli-color'),
       parse = require('css-parse'),
     Hashids = require('hashids'),
-    hashids = new Hashids("use the force harry");
+    hashids = new Hashids("use the force harry", 8);
 
 /**
  * MUNCHER!!!!
