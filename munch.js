@@ -54,6 +54,7 @@ var Muncher = function(args) {
     }
 
     this.postfix = '.munched';
+    this.prefix = 'u';
 
     // pass to the init function
     if (args) {
@@ -105,6 +106,7 @@ Muncher.prototype.init = function(args) {
     }
 
     this.postfix = typeof args['postfix'] != undefined ? args['postfix']: this.postfix;
+    this.prefix = typeof args['prefix'] != undefined ? args['prefix']: this.prefix;
 
     // chainable
     return this;
@@ -323,7 +325,7 @@ Muncher.prototype.addClass = function(cl) {
     var addClass = function(cls) {
         if (that.ignoreClasses.indexOf(cls) > -1) return true; // shoul be a list of no-nos
         if (!that.map["class"][cls]) {
-            that.map["class"][cls] = hashids.encrypt(that.mapCounter);
+            that.map["class"][cls] = this.prefix + hashids.encrypt(that.mapCounter);
             that.mapCounter++;
         }
     }
@@ -349,7 +351,7 @@ Muncher.prototype.addClass = function(cl) {
 Muncher.prototype.addId = function(id) {
     if (!this.map["id"][id]) {
         if (!this.ignoreIds.indexOf(id)) return true; // shoul be a list of no-nos
-        this.map["id"][id] = hashids.encrypt(this.mapCounter);
+        this.map["id"][id] = this.prefix + hashids.encrypt(this.mapCounter);
         this.mapCounter++;
     }
 }
