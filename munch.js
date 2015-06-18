@@ -53,6 +53,8 @@ var Muncher = function(args) {
         "js": []
     }
 
+    this.postfix = '.munched';
+
     // pass to the init function
     if (args) {
         this.init(args);
@@ -101,6 +103,8 @@ Muncher.prototype.init = function(args) {
         "css": args['css'],
         "js": args['js']
     }
+
+    this.postfix = typeof args['postfix'] != undefined ? args['postfix']: this.postfix;
 
     // chainable
     return this;
@@ -533,11 +537,11 @@ Muncher.prototype.rewriteHtml = function(html, to) {
     html = this.rewriteJsBlock(html);
     html = this.rewriteCssBlock(html, this.compress['view']);
 
-    fs.writeFileSync(to + '.munched', (this.compress['view']) ? this.compressHtml(html): html);
+    fs.writeFileSync(to + this.postfix, (this.compress['view']) ? this.compressHtml(html): html);
 
-    var percent = 100 - ((fs.statSync(to + '.munched').size / this.files[to]) * 100);
+    var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
     var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
-    that.echo(savings + to + '.munched');
+    that.echo(savings + to + this.postfix);
 }
 
 /**
@@ -631,11 +635,11 @@ Muncher.prototype.rewriteCss = function(css, to) {
 
     that.files[to] = fs.statSync(to).size;
 
-    fs.writeFileSync(to + '.munched', (this.compress['css']) ? this.compressCss(text): text);
+    fs.writeFileSync(to + this.postfix, (this.compress['css']) ? this.compressCss(text): text);
 
-    var percent = 100 - ((fs.statSync(to + '.munched').size / this.files[to]) * 100);
+    var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
     var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
-    that.echo(savings + to + '.munched');
+    that.echo(savings + to + this.postfix);
 }
 
 /**
@@ -734,11 +738,11 @@ Muncher.prototype.rewriteJs = function(js, to) {
 
     js = that.rewriteJsString(js);
 
-    fs.writeFileSync(to + '.munched', (this.compress['js']) ? this.compressJs(js): js);
+    fs.writeFileSync(to + this.postfix, (this.compress['js']) ? this.compressJs(js): js);
 
-    var percent = 100 - ((fs.statSync(to + '.munched').size / this.files[to]) * 100);
+    var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
     var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
-    that.echo(savings + to + '.munched');
+    that.echo(savings + to + this.postfix);
 }
 
 /**
