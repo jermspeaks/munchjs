@@ -1,7 +1,7 @@
 {
-  "name": "munch",
+  "name": "munchjs",
   "description": "Munch.js is a utility that rewrites classes and ids in CSS, HTML, and JavaScript files in order to save precious bytes and obfuscate your code.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "John Rocela",
     "url": "http://iamjamoy.com/"
@@ -9,15 +9,15 @@
   "homepage": "http://jmrocela.github.io/munchjs",
   "repository": {
     "type": "git",
-    "url": "git://github.com/jmrocela/munchjs.git"
+    "url": "git://github.com/pliashkou/munchjs.git"
   },
   "bugs": {
-    "url": "http://github.com/jmrocela/munchjs/issues"
+    "url": "http://github.com/pliashkou/munchjs/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "http://github.com/jmrocela/munchjs/blob/master/LICENSE-MIT"
+      "url": "http://github.com/pliashkou/munchjs/blob/master/LICENSE-MIT"
     }
   ],
   "preferGlobal": true,
@@ -60,6 +60,10 @@
     {
       "name": "John Rocela",
       "url": "http://iamjamoy.com/"
+    },
+    {
+      "name": "Yury Pliashkou",
+      "url": "http://pliashkou.com/"
     }
   ],
   "readmeFilename": "README.md",
