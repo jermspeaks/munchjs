@@ -63,7 +63,7 @@ Muncher.prototype.init = function(args) {
 
     // a reference to `this`
     var that = this;
-    
+
     // set the ignore maps for Ids and Classes
     this.ignore = args['ignore'] || '';
     this.ignore.split(',').forEach(function(ign) {
@@ -106,7 +106,7 @@ Muncher.prototype.init = function(args) {
     return this;
 }
 
-/** 
+/**
  * run
  *
  * sets various options to run the Muncher
@@ -156,7 +156,7 @@ Muncher.prototype.run = function() {
 
 }
 
-/** 
+/**
  * read
  *
  * use a map file to serve as the dictionary
@@ -177,7 +177,7 @@ Muncher.prototype.read = function(read) {
 
 }
 
-/** 
+/**
  * parseDir
  *
  * parse directories according to context
@@ -187,7 +187,7 @@ Muncher.prototype.read = function(read) {
  */
 Muncher.prototype.parseDir = function(path, context) {
     var that = this;
-        
+
     that.echo(clc.bold('Processing ' + context));
 
     that.paths[context].split(',').forEach(function(path) {
@@ -202,12 +202,12 @@ Muncher.prototype.parseDir = function(path, context) {
             that.parse(path, context);
         }
     });
-    
+
     that.echo(clc.green.bold('Finished!\n'));
 
 }
 
-/** 
+/**
  * buildDir
  *
  * build directories according to context
@@ -216,7 +216,7 @@ Muncher.prototype.parseDir = function(path, context) {
  * @param context String either view, js or css
  */
 Muncher.prototype.buildDir = function(path, context) {
-    var that = this;    
+    var that = this;
 
     that.echo(clc.bold('Rewriting ' + context));
 
@@ -232,11 +232,11 @@ Muncher.prototype.buildDir = function(path, context) {
             that.build(path, context);
         }
     });
-    
+
     that.echo(clc.green.bold('Finished!\n'));
 }
 
-/** 
+/**
  * echo
  *
  * wrap the console.log method
@@ -247,7 +247,7 @@ Muncher.prototype.echo = function(message) {
     if (!this.silent) console.log(message);
 }
 
-/** 
+/**
  * parse
  *
  * parse files according to context
@@ -266,10 +266,10 @@ Muncher.prototype.parse = function(file, context) {
             case "view":
                 this.parseHtml(content);
             break;
-            case "css": 
+            case "css":
                 this.parseCss(content);
             break;
-            case "js": 
+            case "js":
                 this.parseJs(content);
             break;
         }
@@ -280,7 +280,7 @@ Muncher.prototype.parse = function(file, context) {
 
 }
 
-/** 
+/**
  * build
  *
  * build files according to context
@@ -296,17 +296,17 @@ Muncher.prototype.build = function(file, context) {
         case "view":
             this.rewriteHtml(content, file);
         break;
-        case "css": 
+        case "css":
             this.rewriteCss(content, file);
         break;
-        case "js": 
+        case "js":
             this.rewriteJs(content, file);
         break;
     }
 
 }
 
-/** 
+/**
  * addCss
  *
  * adds Classes to the CLASS map
@@ -319,7 +319,7 @@ Muncher.prototype.addClass = function(cl) {
     var addClass = function(cls) {
         if (that.ignoreClasses.indexOf(cls) > -1) return true; // shoul be a list of no-nos
         if (!that.map["class"][cls]) {
-            that.map["class"][cls] = hashids.encrypt(that.mapCounter); 
+            that.map["class"][cls] = hashids.encrypt(that.mapCounter);
             that.mapCounter++;
         }
     }
@@ -332,10 +332,10 @@ Muncher.prototype.addClass = function(cl) {
         }
     } else {
         addClass(cl);
-    } 
+    }
 }
 
-/** 
+/**
  * addId
  *
  * adds Ids to the ID map
@@ -350,7 +350,7 @@ Muncher.prototype.addId = function(id) {
     }
 }
 
-/** 
+/**
  * parseCssSelector
  *
  * parse CSS strings to get their classes and ids
@@ -377,7 +377,7 @@ Muncher.prototype.parseCssSelector = function(selector) {
     }
 }
 
-/** 
+/**
  * parseHtml
  *
  * parse HTML documents to get their classes and ids
@@ -424,14 +424,14 @@ Muncher.prototype.parseHtml = function(html) {
 
 }
 
-/** 
+/**
  * parseCss
  *
  * parse CSS documents to get their classes and ids
  *
  * @param css String the css document
  */
-Muncher.prototype.parseCss = function(css) { 
+Muncher.prototype.parseCss = function(css) {
     var   that = this,
            css = parse(css),
         styles = [];
@@ -453,7 +453,7 @@ Muncher.prototype.parseCss = function(css) {
     });
 }
 
-/** 
+/**
  * parseJs
  *
  * parse JS documents to get their classes and ids
@@ -491,7 +491,7 @@ Muncher.prototype.parseJs = function(js) {
 
 }
 
-/** 
+/**
  * rewriteHtml
  *
  * replaces the ids and classes in the files specified
@@ -540,7 +540,7 @@ Muncher.prototype.rewriteHtml = function(html, to) {
     that.echo(savings + to + '.munched');
 }
 
-/** 
+/**
  * rewriteCssString
  *
  * rewrite a CSS String
@@ -591,7 +591,7 @@ Muncher.prototype.rewriteCssString = function(css) {
     return text;
 }
 
-/** 
+/**
  * rewriteCssBlock
  *
  * rewrite a CSS block in an html document
@@ -617,7 +617,7 @@ Muncher.prototype.rewriteCssBlock = function(html, compress) {
     return document.innerHTML;
 }
 
-/** 
+/**
  * rewriteCss
  *
  * rewrite a CSS file
@@ -638,7 +638,7 @@ Muncher.prototype.rewriteCss = function(css, to) {
     that.echo(savings + to + '.munched');
 }
 
-/** 
+/**
  * rewriteJsString
  *
  * rewrite a JS String
@@ -692,7 +692,7 @@ Muncher.prototype.rewriteJsString = function(js) {
     return js;
 }
 
-/** 
+/**
  * rewriteJsBlock
  *
  * rewrite a JS block in an html document
@@ -719,7 +719,7 @@ Muncher.prototype.rewriteJsBlock = function(html, compress) {
     return block;
 }
 
-/** 
+/**
  * rewriteJs
  *
  * rewrite a JS file
@@ -741,7 +741,7 @@ Muncher.prototype.rewriteJs = function(js, to) {
     that.echo(savings + to + '.munched');
 }
 
-/** 
+/**
  * compressHtml
  *
  * Compress HTML Files to save a couple of bytes. Someone tell me where I got this. I need to
@@ -764,17 +764,17 @@ Muncher.prototype.compressHtml = function(html, compressHead){
         //Don't compress the head
         allHTML = allHTML.replace(new RegExp('</HEAD', 'gi'), '</head');
         allHTML = allHTML.replace(new RegExp('</head ', 'gi'), '</head');
-        
-        var bodySplit = '</head>'; 
+
+        var bodySplit = '</head>';
         var i = allHTML.indexOf(bodySplit) != -1;
-        
+
         if (i == true) {
-            var bodySplit = '</head>'; 
+            var bodySplit = '</head>';
             var tempo = allHTML.split(new RegExp(bodySplit, 'i'));
             headHTML = tempo[0];
             allHTML = tempo[1];
         } else {
-            bodySplit = ''; 
+            bodySplit = '';
         }
 
         allHTML = allHTML.replace(/(\r\n|\n|\r|\t)/gm, '');
@@ -785,7 +785,7 @@ Muncher.prototype.compressHtml = function(html, compressHead){
     return allHTML;
 }
 
-/** 
+/**
  * compressCss
  *
  * A simple CSS minifier. removes all newlines, tabs and spaces. also strips out comments.
@@ -798,7 +798,7 @@ Muncher.prototype.compressCss = function(css) {
     return css.replace(/\/\*(.*?)\*\//gm, "");
 }
 
-/** 
+/**
  * compressJs
  *
  * A placeholder for future use perhaps?
@@ -809,7 +809,7 @@ Muncher.prototype.compressJs = function(js) {
     return js;
 }
 
-/** 
+/**
  * addJsParser
  *
  * plug different JS parsers here. Parsers are loaded dynamically from the `parsers` folder
@@ -822,7 +822,7 @@ Muncher.prototype.addJsParser = function(cb) {
     }
 }
 
-/** 
+/**
  * addJsWriter
  *
  * plug different JS writers here. Writers are loaded dynamically from the `parsers` folder
@@ -835,7 +835,7 @@ Muncher.prototype.addJsWriter = function(cb) {
     }
 }
 
-/** 
+/**
  * module_exists
  *
  * Check if a module exists
@@ -843,20 +843,20 @@ Muncher.prototype.addJsWriter = function(cb) {
  * @param module_exists String the module name
  */
 function module_exists(name) {
-    try { 
+    try {
         return require.resolve(name);
     } catch(e) {
         return false
     }
 }
 
-/** 
+/**
  * let's not forget to expose this
  */
 exports.run = function() {
     // fetch the script options from CLI
     var args = require('optimist')
-                    .usage(fs.readFileSync('./usage').toString())
+                    .usage(fs.readFileSync(__dirname+'/usage').toString())
                     .demand(['view'])
                     .argv;
 
