@@ -12,13 +12,13 @@
 
 'use strict';
 
-var    path = require('path'),
-       glob = require('glob'),
-         fs = require('fs'),
-      jsdom = require('jsdom').jsdom,
-          $ = require('jquery'),
-        clc = require('cli-color'),
-      parse = require('css-parse'),
+var path = require('path'),
+    glob = require('glob'),
+    fs = require('fs'),
+    jsdom = require('jsdom').jsdom,
+    $ = require('jquery'),
+    clc = require('cli-color'),
+    parse = require('css-parse'),
     Hashids = require('hashids'),
     hashids = new Hashids("use the force harry", 8);
 
@@ -27,7 +27,7 @@ var    path = require('path'),
  *
  * @param args Object an optimist.args object.
  */
-var Muncher = function(args) {
+var Muncher = function (args) {
     // tokens from files within views, css and js together
     this.map = {
         "id": {},
@@ -35,14 +35,14 @@ var Muncher = function(args) {
     };
 
     // files, keep track of sizes
-    this.files = { }
+    this.files = {}
 
     // token counter
     this.mapCounter = 0;
 
     // ignore classes
-    this.ignoreClasses = [ ];
-    this.ignoreIds = [ ];
+    this.ignoreClasses = [];
+    this.ignoreIds = [];
 
     // custom parser collection
     this.parsers = {
@@ -54,7 +54,7 @@ var Muncher = function(args) {
     }
 
     this.postfix = '.munched';
-    this.prefix = 'u';
+    this.prefix = '';
 
     // pass to the init function
     if (args) {
@@ -62,15 +62,15 @@ var Muncher = function(args) {
     }
 }
 
-Muncher.prototype.init = function(args) {
+Muncher.prototype.init = function (args) {
 
     // a reference to `this`
     var that = this;
 
     // set the ignore maps for Ids and Classes
     this.ignore = args['ignore'] || '';
-    this.ignore.split(',').forEach(function(ign) {
-        ign = ign.replace(/\s/,'');
+    this.ignore.split(',').forEach(function (ign) {
+        ign = ign.replace(/\s/, '');
         if (ign.indexOf('.') === 0) that.ignoreClasses.push(ign.replace('.', ''));
         if (ign.indexOf('#') === 0) that.ignoreIds.push(ign.replace('#', ''));
     });
@@ -105,8 +105,8 @@ Muncher.prototype.init = function(args) {
         "js": args['js']
     }
 
-    this.postfix = typeof args['postfix'] != undefined ? args['postfix']: this.postfix;
-    this.prefix = typeof args['prefix'] != undefined ? args['prefix']: this.prefix;
+    this.postfix = typeof args['postfix'] != undefined ? args['postfix'] : this.postfix;
+    this.prefix = typeof args['prefix'] != undefined ? args['prefix'] : this.prefix;
 
     // chainable
     return this;
@@ -117,7 +117,7 @@ Muncher.prototype.init = function(args) {
  *
  * sets various options to run the Muncher
  */
-Muncher.prototype.run = function() {
+Muncher.prototype.run = function () {
 
     if (!this.readFile) {
         // run through the HTML files
@@ -132,7 +132,7 @@ Muncher.prototype.run = function() {
     if (typeof this.mapFile === 'string' && !this.readFile) {
 
         if (this.mapFile) {
-            var map = { id: [], class: [] };
+            var map = {id: [], class: []};
 
             for (var key in this.map["id"]) {
                 map["id"].push(key);
@@ -169,15 +169,15 @@ Muncher.prototype.run = function() {
  *
  * @param read String the path to the mapfile
  */
-Muncher.prototype.read = function(read) {
+Muncher.prototype.read = function (read) {
     var manifest = JSON.parse(fs.readFileSync(read, 'utf-8').toString()),
-    that = this;
+        that = this;
 
-    $.each(manifest["id"], function(i, id) {
+    $.each(manifest["id"], function (i, id) {
         that.addId(id);
     });
 
-    $.each(manifest["class"], function(i, cls) {
+    $.each(manifest["class"], function (i, cls) {
         that.addClass(cls);
     });
 
@@ -191,16 +191,16 @@ Muncher.prototype.read = function(read) {
  * @param path String the path of the directory
  * @param context String either view, js or css
  */
-Muncher.prototype.parseDir = function(path, context) {
+Muncher.prototype.parseDir = function (path, context) {
     var that = this;
 
     that.echo(clc.bold('Processing ' + context));
 
-    that.paths[context].split(',').forEach(function(path) {
+    that.paths[context].split(',').forEach(function (path) {
         if (fs.statSync(path).isDirectory()) {
             var files = glob.sync(path.replace(/\/$/, '') + '/**/*' + that.extensions[context]);
 
-            files.forEach(function(file) {
+            files.forEach(function (file) {
                 that.parse(file, context);
             });
 
@@ -221,16 +221,16 @@ Muncher.prototype.parseDir = function(path, context) {
  * @param path String the path of the directory
  * @param context String either view, js or css
  */
-Muncher.prototype.buildDir = function(path, context) {
+Muncher.prototype.buildDir = function (path, context) {
     var that = this;
 
     that.echo(clc.bold('Rewriting ' + context));
 
-    that.paths[context].split(',').forEach(function(path) {
+    that.paths[context].split(',').forEach(function (path) {
         if (fs.lstatSync(path).isDirectory()) {
             var files = glob.sync(path.replace(/\/$/, '') + '/**/*' + that.extensions[context]);
 
-            files.forEach(function(file) {
+            files.forEach(function (file) {
                 that.build(file, context);
             });
 
@@ -249,7 +249,7 @@ Muncher.prototype.buildDir = function(path, context) {
  *
  * @param message String
  */
-Muncher.prototype.echo = function(message) {
+Muncher.prototype.echo = function (message) {
     if (!this.silent) console.log(message);
 }
 
@@ -261,7 +261,7 @@ Muncher.prototype.echo = function(message) {
  * @param file String the file name of the document
  * @param context String either view, js or css
  */
-Muncher.prototype.parse = function(file, context) {
+Muncher.prototype.parse = function (file, context) {
 
     if (fs.existsSync(file)) {
         this.echo(file);
@@ -271,13 +271,13 @@ Muncher.prototype.parse = function(file, context) {
         switch (context) {
             case "view":
                 this.parseHtml(content);
-            break;
+                break;
             case "css":
                 this.parseCss(content);
-            break;
+                break;
             case "js":
                 this.parseJs(content);
-            break;
+                break;
         }
 
     } else {
@@ -294,20 +294,20 @@ Muncher.prototype.parse = function(file, context) {
  * @param file String the file name of the document
  * @param context String either view, js or css
  */
-Muncher.prototype.build = function(file, context) {
+Muncher.prototype.build = function (file, context) {
 
     var content = fs.readFileSync(file, 'utf8').toString();
 
     switch (context) {
         case "view":
             this.rewriteHtml(content, file);
-        break;
+            break;
         case "css":
             this.rewriteCss(content, file);
-        break;
+            break;
         case "js":
             this.rewriteJs(content, file);
-        break;
+            break;
     }
 
 }
@@ -319,20 +319,20 @@ Muncher.prototype.build = function(file, context) {
  *
  * @param cl String
  */
-Muncher.prototype.addClass = function(cl) {
+Muncher.prototype.addClass = function (cl) {
     var that = this;
 
-    var addClass = function(cls) {
+    var addClass = function (cls) {
         if (that.ignoreClasses.indexOf(cls) > -1) return true; // shoul be a list of no-nos
         if (!that.map["class"][cls]) {
-            that.map["class"][cls] = this.prefix + hashids.encrypt(that.mapCounter);
+            that.map["class"][cls] = that.prefix + hashids.encrypt(that.mapCounter);
             that.mapCounter++;
         }
     }
 
-    if (typeof cl == 'object'){
+    if (typeof cl == 'object') {
         if (cl) {
-            cl.forEach(function(pass) {
+            cl.forEach(function (pass) {
                 addClass(pass);
             });
         }
@@ -348,7 +348,7 @@ Muncher.prototype.addClass = function(cl) {
  *
  * @param id String
  */
-Muncher.prototype.addId = function(id) {
+Muncher.prototype.addId = function (id) {
     if (!this.map["id"][id]) {
         if (!this.ignoreIds.indexOf(id)) return true; // shoul be a list of no-nos
         this.map["id"][id] = this.prefix + hashids.encrypt(this.mapCounter);
@@ -363,20 +363,20 @@ Muncher.prototype.addId = function(id) {
  *
  * @param css String the css string
  */
-Muncher.prototype.parseCssSelector = function(selector) {
+Muncher.prototype.parseCssSelector = function (selector) {
     var that = this,
         match = null,
         tid = selector.match(/#[\w\-]+/gi),
         tcl = selector.match(/\.[\w\-]+/gi);
 
     if (tid) {
-        tid.forEach(function(match) {
+        tid.forEach(function (match) {
             var id = match.replace('#', '');
             that.addId(id);
         });
     }
     if (tcl) {
-        tcl.forEach(function(match) {
+        tcl.forEach(function (match) {
             var cl = match.replace('.', '');
             that.addClass(cl);
         });
@@ -390,14 +390,14 @@ Muncher.prototype.parseCssSelector = function(selector) {
  *
  * @param html String the html document
  */
-Muncher.prototype.parseHtml = function(html) {
+Muncher.prototype.parseHtml = function (html) {
     var that = this,
         html = $(html);
 
-    html.find('*').each(function(i, elem) {
+    html.find('*').each(function (i, elem) {
         var target = html.find(elem),
-                id = target.attr('id'),
-           classes = target.attr('class');
+            id = target.attr('id'),
+            classes = target.attr('class');
 
         if (id) {
             that.addId(id);
@@ -406,14 +406,14 @@ Muncher.prototype.parseHtml = function(html) {
         if (classes) {
             var newClass = [];
 
-            classes.split(' ').forEach(function(cl) {
+            classes.split(' ').forEach(function (cl) {
                 that.addClass(cl);
             });
 
         }
 
         if (target.is('style')) {
-            var  style = target.text();
+            var style = target.text();
             that.parseCss(style);
         }
 
@@ -421,7 +421,7 @@ Muncher.prototype.parseHtml = function(html) {
 
     // parse JS
     var script = '';
-    html.filter('script').each(function(i, tag) {
+    html.filter('script').each(function (i, tag) {
         script += this.text || this.textContent || this.innerHTML || '';
     });
     if (script != '') {
@@ -437,12 +437,12 @@ Muncher.prototype.parseHtml = function(html) {
  *
  * @param css String the css document
  */
-Muncher.prototype.parseCss = function(css) {
-    var   that = this,
-           css = parse(css),
+Muncher.prototype.parseCss = function (css) {
+    var that = this,
+        css = parse(css),
         styles = [];
 
-    $.each(css.stylesheet.rules, function(i, style) {
+    $.each(css.stylesheet.rules, function (i, style) {
         if (style.media) {
             styles = styles.concat(style.rules);
         }
@@ -452,8 +452,8 @@ Muncher.prototype.parseCss = function(css) {
         styles.push(css.stylesheet.rules[i]);
     });
 
-    $.each(styles, function(o, style) {
-        style.selectors.forEach(function(selector) {
+    $.each(styles, function (o, style) {
+        style.selectors.forEach(function (selector) {
             that.parseCssSelector(selector);
         });
     });
@@ -466,13 +466,13 @@ Muncher.prototype.parseCss = function(css) {
  *
  * @param js String the js document
  */
-Muncher.prototype.parseJs = function(js) {
+Muncher.prototype.parseJs = function (js) {
     var that = this,
         match;
 
     // custom parsers
     if (this.parsers.js.length > 0) {
-        this.parsers.js.forEach(function(cb) {
+        this.parsers.js.forEach(function (cb) {
             cb.call(that, js);
         });
     }
@@ -505,17 +505,17 @@ Muncher.prototype.parseJs = function(js) {
  * @param html String the html document
  * @param to String the file name
  */
-Muncher.prototype.rewriteHtml = function(html, to) {
-    var     that = this,
+Muncher.prototype.rewriteHtml = function (html, to) {
+    var that = this,
         document = jsdom(html),
-            html = $(document);
+        html = $(document);
 
     that.files[to] = fs.statSync(to).size;
 
-    html.find('*').each(function(i, elem) {
+    html.find('*').each(function (i, elem) {
         var target = html.find(elem),
-                id = target.attr('id'),
-           classes = target.attr('class');
+            id = target.attr('id'),
+            classes = target.attr('class');
 
         if (id) {
             if (!that.ignoreIds.indexOf(id)) return true;
@@ -524,7 +524,7 @@ Muncher.prototype.rewriteHtml = function(html, to) {
 
         if (classes) {
             var newClass = [];
-            classes.split(' ').forEach(function(cl) {
+            classes.split(' ').forEach(function (cl) {
                 if (!that.ignoreClasses.indexOf(cl)) return true;
                 if (that.map["class"][cl]) {
                     target.removeClass(cl).addClass(that.map["class"][cl]);
@@ -539,10 +539,10 @@ Muncher.prototype.rewriteHtml = function(html, to) {
     html = this.rewriteJsBlock(html);
     html = this.rewriteCssBlock(html, this.compress['view']);
 
-    fs.writeFileSync(to + this.postfix, (this.compress['view']) ? this.compressHtml(html): html);
+    fs.writeFileSync(to + this.postfix, (this.compress['view']) ? this.compressHtml(html) : html);
 
     var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
-    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
+    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ' : '';
     that.echo(savings + to + this.postfix);
 }
 
@@ -553,13 +553,13 @@ Muncher.prototype.rewriteHtml = function(html, to) {
  *
  * @param css String the css document
  */
-Muncher.prototype.rewriteCssString = function(css) {
-    var   that = this,
-          text = css,
+Muncher.prototype.rewriteCssString = function (css) {
+    var that = this,
+        text = css,
         styles = [],
-           css = parse(text);
+        css = parse(text);
 
-    $.each(css.stylesheet.rules, function(i, style) {
+    $.each(css.stylesheet.rules, function (i, style) {
         if (style.media) {
             styles = styles.concat(style.rules);
         }
@@ -569,21 +569,21 @@ Muncher.prototype.rewriteCssString = function(css) {
         styles.push(css.stylesheet.rules[i]);
     });
 
-    $.each(styles, function(u, style) {
-        style.selectors.forEach(function(selector) {
+    $.each(styles, function (u, style) {
+        style.selectors.forEach(function (selector) {
             var original = selector,
-                     tid = selector.match(/#[\w\-]+/gi),
-                     tcl = selector.match(/\.[\w\-]+/gi);
+                tid = selector.match(/#[\w\-]+/gi),
+                tcl = selector.match(/\.[\w\-]+/gi);
 
             if (tid) {
-                $.each(tid, function(i, match) {
+                $.each(tid, function (i, match) {
                     match = match.replace('#', '');
                     if (that.ignoreIds.indexOf(match) > -1) return true;
                     selector = selector.replace(new RegExp("#" + match.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), "gi"), '#' + that.map["id"][match]);
                 });
             }
             if (tcl) {
-                $.each(tcl, function(o, match) {
+                $.each(tcl, function (o, match) {
                     match = match.replace('.', '');
                     if (that.ignoreClasses.indexOf(match) > -1) return true;
                     selector = selector.replace(new RegExp("\\." + match.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), "gi"), '.' + that.map["class"][match]);
@@ -605,17 +605,17 @@ Muncher.prototype.rewriteCssString = function(css) {
  * @param html String the html document
  * @param compress Boolean flag whether to compress the CSS block
  */
-Muncher.prototype.rewriteCssBlock = function(html, compress) {
-    var     that = this,
+Muncher.prototype.rewriteCssBlock = function (html, compress) {
+    var that = this,
         document = jsdom(html),
-            html = $(document);
+        html = $(document);
 
-    html.find('*').each(function(i, elem) {
+    html.find('*').each(function (i, elem) {
         var target = html.find(elem);
 
         if (target.is('style')) {
             var text = that.rewriteCssString(target.text());
-            target.text(compress ? that.compressCss(text): text);
+            target.text(compress ? that.compressCss(text) : text);
         }
 
     });
@@ -631,16 +631,16 @@ Muncher.prototype.rewriteCssBlock = function(html, compress) {
  * @param css String the css document
  * @param to String the file name
  */
-Muncher.prototype.rewriteCss = function(css, to) {
+Muncher.prototype.rewriteCss = function (css, to) {
     var that = this,
         text = that.rewriteCssString(css);
 
     that.files[to] = fs.statSync(to).size;
 
-    fs.writeFileSync(to + this.postfix, (this.compress['css']) ? this.compressCss(text): text);
+    fs.writeFileSync(to + this.postfix, (this.compress['css']) ? this.compressCss(text) : text);
 
     var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
-    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
+    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ' : '';
     that.echo(savings + to + this.postfix);
 }
 
@@ -651,8 +651,8 @@ Muncher.prototype.rewriteCss = function(css, to) {
  *
  * @param js String the js document
  */
-Muncher.prototype.rewriteJsString = function(js) {
-    var  that = this,
+Muncher.prototype.rewriteJsString = function (js) {
+    var that = this,
         match = null;
 
     // id and class
@@ -673,11 +673,11 @@ Muncher.prototype.rewriteJsString = function(js) {
     // attr
     var pass7 = /setAttribute\([\'"](id|class)[\'"],\s[\'"](.+?)[\'"]/gi;
     while ((match = pass7.exec(js)) !== null) {
-        var key = (match[1] == 'id') ? 'id': 'class';
+        var key = (match[1] == 'id') ? 'id' : 'class';
         if (key == 'class') {
             var passed = match[0],
                 splitd = match[2].split(' ');
-            $.each(splitd, function(i, cls) {
+            $.each(splitd, function (i, cls) {
                 if (that.ignoreClasses.indexOf(cls) > -1) return true;
                 passed = passed.replace(new RegExp(cls, "gi"), that.map[key][cls]);
             });
@@ -690,7 +690,7 @@ Muncher.prototype.rewriteJsString = function(js) {
 
     // custom parsers
     if (this.writers.js.length > 0) {
-        this.writers.js.forEach(function(cb) {
+        this.writers.js.forEach(function (cb) {
             js = cb.call(that, js);
         });
     }
@@ -706,21 +706,21 @@ Muncher.prototype.rewriteJsString = function(js) {
  * @param html String the html document
  * @param compress Boolean flag whether to compress the JS block
  */
-Muncher.prototype.rewriteJsBlock = function(html, compress) {
-    var     that = this,
+Muncher.prototype.rewriteJsBlock = function (html, compress) {
+    var that = this,
         document = jsdom(html),
-            html = $(document);
+        html = $(document);
 
     var match;
 
-    html.find('script').each(function(i, elem) {
+    html.find('script').each(function (i, elem) {
         var target = html.find(elem),
-                js = that.rewriteJsString(target.text());
+            js = that.rewriteJsString(target.text());
 
         target.text(js);
     });
 
-    var block = (compress) ? this.compressJs(document.innerHTML): document.innerHTML;
+    var block = (compress) ? this.compressJs(document.innerHTML) : document.innerHTML;
 
     return block;
 }
@@ -733,17 +733,17 @@ Muncher.prototype.rewriteJsBlock = function(html, compress) {
  * @param js String the js document
  * @param to String the file name
  */
-Muncher.prototype.rewriteJs = function(js, to) {
-    var  that = this;
+Muncher.prototype.rewriteJs = function (js, to) {
+    var that = this;
 
     that.files[to] = fs.statSync(to).size;
 
     js = that.rewriteJsString(js);
 
-    fs.writeFileSync(to + this.postfix, (this.compress['js']) ? this.compressJs(js): js);
+    fs.writeFileSync(to + this.postfix, (this.compress['js']) ? this.compressJs(js) : js);
 
     var percent = 100 - ((fs.statSync(to + this.postfix).size / this.files[to]) * 100);
-    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ': '';
+    var savings = (that.showSavings) ? clc.blue.bold(percent.toFixed(2) + '%') + ' Saved for ' : '';
     that.echo(savings + to + this.postfix);
 }
 
@@ -756,11 +756,11 @@ Muncher.prototype.rewriteJs = function(js, to) {
  * @param html String The HTML string to be minified
  * @param compressHead Boolean Option whether the <head> tag should be compressed as well
  */
-Muncher.prototype.compressHtml = function(html, compressHead){
-    var   allHTML = html,
-         headHTML = '',
-       removeThis = '',
-       headstatus = compressHead || true;
+Muncher.prototype.compressHtml = function (html, compressHead) {
+    var allHTML = html,
+        headHTML = '',
+        removeThis = '',
+        headstatus = compressHead || true;
 
     if (headstatus != true) {
         //Compress all the things!
@@ -798,7 +798,7 @@ Muncher.prototype.compressHtml = function(html, compressHead){
  *
  * @param css String The CSS string to be minified
  */
-Muncher.prototype.compressCss = function(css) {
+Muncher.prototype.compressCss = function (css) {
     css = css.replace(/(\r\n|\n|\r|\t)/gm, "");
     css = css.replace(/\s+/g, " ");
     return css.replace(/\/\*(.*?)\*\//gm, "");
@@ -811,7 +811,7 @@ Muncher.prototype.compressCss = function(css) {
  *
  * @param js String The JS string to be minified
  */
-Muncher.prototype.compressJs = function(js) {
+Muncher.prototype.compressJs = function (js) {
     return js;
 }
 
@@ -822,7 +822,7 @@ Muncher.prototype.compressJs = function(js) {
  *
  * @param cb Function the callback for parsing JS Strings
  */
-Muncher.prototype.addJsParser = function(cb) {
+Muncher.prototype.addJsParser = function (cb) {
     if (typeof cb == 'function') {
         this.parsers.js.push(cb);
     }
@@ -835,7 +835,7 @@ Muncher.prototype.addJsParser = function(cb) {
  *
  * @param cb Function the callback for writing JS Strings
  */
-Muncher.prototype.addJsWriter = function(cb) {
+Muncher.prototype.addJsWriter = function (cb) {
     if (typeof cb == 'function') {
         this.writers.js.push(cb);
     }
@@ -851,7 +851,7 @@ Muncher.prototype.addJsWriter = function(cb) {
 function module_exists(name) {
     try {
         return require.resolve(name);
-    } catch(e) {
+    } catch (e) {
         return false
     }
 }
@@ -860,7 +860,7 @@ function module_exists(name) {
  * allow to run with args
  */
 
-exports.runWithArgs = function(args) {
+exports.runWithArgs = function (args) {
     var munch = new Muncher(args);
     munch.run();
 };
@@ -868,16 +868,16 @@ exports.runWithArgs = function(args) {
 /**
  * let's not forget to expose this
  */
-exports.run = function() {
+exports.run = function () {
     // fetch the script options from CLI
     var args = require('optimist')
-                    .usage(fs.readFileSync(__dirname+'/usage').toString())
-                    .demand(['view'])
-                    .argv;
+        .usage(fs.readFileSync(__dirname + '/usage').toString())
+        .demand(['view'])
+        .argv;
 
     // we have a settings file specifically specified or args is empty
     if (args['manifest']) {
-        args['manifest'] = (typeof args['manifest'] == 'string') ? args['manifest']: '.muncher';
+        args['manifest'] = (typeof args['manifest'] == 'string') ? args['manifest'] : '.muncher';
 
         // see if the file exists and get it
         if (fs.existsSync(args['manifest'])) {
@@ -916,7 +916,7 @@ exports.run = function() {
     // add custom JS parsers
     if (args['parsers']) {
         var parsers = args['parsers'].split(',');
-        parsers.forEach(function(parser) {
+        parsers.forEach(function (parser) {
             if (module_exists(parser)) {
                 var lib = require(parser);
                 if (lib.parser) munch.addJsParser(lib.parser);
