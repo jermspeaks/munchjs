@@ -541,8 +541,8 @@ Muncher.prototype.rewriteHtml = function (html, to) {
 
     // write
     html = serializeDocument(html.find('body > *'));
-    html = this.rewriteJsBlock(html);
-    html = this.rewriteCssBlock(html, this.compress['view']);
+    //html = this.rewriteJsBlock(html);
+    //html = this.rewriteCssBlock(html, this.compress['view']);
 
     fs.writeFileSync(to + this.postfix, (this.compress['view']) ? this.compressHtml(html) : html);
 
