@@ -16,11 +16,12 @@ var path = require('path'),
     glob = require('glob'),
     fs = require('fs'),
     jsdom = require('jsdom').jsdom,
-    $ = require('jquery')(jsdom().defaultView),
+    $ = require('jquery'),
     clc = require('cli-color'),
     parse = require('css-parse'),
     Hashids = require('hashids'),
-    hashids = new Hashids("use the force harry", 8);
+    hashids = new Hashids("use the force harry", 8),
+    serializeDocument = require("jsdom").serializeDocument;;
 
 /**
  * MUNCHER!!!!
@@ -391,8 +392,10 @@ Muncher.prototype.parseCssSelector = function (selector) {
  * @param html String the html document
  */
 Muncher.prototype.parseHtml = function (html) {
+
+    var document = jsdom(html);
     var that = this,
-        html = $(html);
+        html = $(document.defaultView)(document);
 
     html.find('*').each(function (i, elem) {
         var target = html.find(elem),
@@ -438,11 +441,13 @@ Muncher.prototype.parseHtml = function (html) {
  * @param css String the css document
  */
 Muncher.prototype.parseCss = function (css) {
+
+    var document = jsdom('');
     var that = this,
         css = parse(css),
         styles = [];
 
-    $.each(css.stylesheet.rules, function (i, style) {
+    $(document.defaultView)(css.stylesheet.rules).each(function (i, style) {
         if (style.media) {
             styles = styles.concat(style.rules);
         }
@@ -452,7 +457,7 @@ Muncher.prototype.parseCss = function (css) {
         styles.push(css.stylesheet.rules[i]);
     });
 
-    $.each(styles, function (o, style) {
+    $(document.defaultView)(styles).each(function (o, style) {
         style.selectors.forEach(function (selector) {
             that.parseCssSelector(selector);
         });
@@ -506,9 +511,9 @@ Muncher.prototype.parseJs = function (js) {
  * @param to String the file name
  */
 Muncher.prototype.rewriteHtml = function (html, to) {
+    var document = jsdom(html);
     var that = this,
-        document = jsdom(html),
-        html = $(document);
+        html = $(document.defaultView)(document);
 
     that.files[to] = fs.statSync(to).size;
 
@@ -535,7 +540,7 @@ Muncher.prototype.rewriteHtml = function (html, to) {
     });
 
     // write
-    html = document.innerHTML;
+    html = serializeDocument(html.find('body *'));
     html = this.rewriteJsBlock(html);
     html = this.rewriteCssBlock(html, this.compress['view']);
 
@@ -554,12 +559,14 @@ Muncher.prototype.rewriteHtml = function (html, to) {
  * @param css String the css document
  */
 Muncher.prototype.rewriteCssString = function (css) {
+
+    var document = jsdom('');
     var that = this,
         text = css,
-        styles = [],
-        css = parse(text);
+        css = parse(text),
+        styles = [];
 
-    $.each(css.stylesheet.rules, function (i, style) {
+    $(document.defaultView)(css.stylesheet.rules).each(function (i, style) {
         if (style.media) {
             styles = styles.concat(style.rules);
         }
@@ -569,7 +576,7 @@ Muncher.prototype.rewriteCssString = function (css) {
         styles.push(css.stylesheet.rules[i]);
     });
 
-    $.each(styles, function (u, style) {
+    $(document.defaultView)(styles).each(function (u, style) {
         style.selectors.forEach(function (selector) {
             var original = selector,
                 tid = selector.match(/#[\w\-]+/gi),
@@ -583,7 +590,7 @@ Muncher.prototype.rewriteCssString = function (css) {
                 });
             }
             if (tcl) {
-                $.each(tcl, function (o, match) {
+                $(document.defaultView)(tcl).each(function (o, match) {
                     match = match.replace('.', '');
                     if (that.ignoreClasses.indexOf(match) > -1) return true;
                     selector = selector.replace(new RegExp("\\." + match.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"), "gi"), '.' + that.map["class"][match]);
@@ -606,9 +613,9 @@ Muncher.prototype.rewriteCssString = function (css) {
  * @param compress Boolean flag whether to compress the CSS block
  */
 Muncher.prototype.rewriteCssBlock = function (html, compress) {
+    var document = jsdom(html);
     var that = this,
-        document = jsdom(html),
-        html = $(document);
+        html = $(document.defaultView)(document);
 
     html.find('*').each(function (i, elem) {
         var target = html.find(elem);
@@ -620,7 +627,7 @@ Muncher.prototype.rewriteCssBlock = function (html, compress) {
 
     });
 
-    return document.innerHTML;
+    return serializeDocument(html.find('body *'));
 }
 
 /**
@@ -707,9 +714,9 @@ Muncher.prototype.rewriteJsString = function (js) {
  * @param compress Boolean flag whether to compress the JS block
  */
 Muncher.prototype.rewriteJsBlock = function (html, compress) {
+    var document = jsdom(html);
     var that = this,
-        document = jsdom(html),
-        html = $(document);
+        html = $(document.defaultView)(document);
 
     var match;
 
@@ -720,7 +727,7 @@ Muncher.prototype.rewriteJsBlock = function (html, compress) {
         target.text(js);
     });
 
-    var block = (compress) ? this.compressJs(document.innerHTML) : document.innerHTML;
+    var block = (compress) ? this.compressJs(serializeDocument(html.find('body *'))) : serializeDocument(html.find('body *'));
 
     return block;
 }
