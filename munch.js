@@ -540,7 +540,7 @@ Muncher.prototype.rewriteHtml = function (html, to) {
     });
 
     // write
-    html = serializeDocument(html.find('body *'));
+    html = serializeDocument(html.find('body > *'));
     html = this.rewriteJsBlock(html);
     html = this.rewriteCssBlock(html, this.compress['view']);
 
